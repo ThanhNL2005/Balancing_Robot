@@ -1,0 +1,4 @@
+../Core/Src/HWT906.c:31:6:angle_referenc	32	static
+../Core/Src/HWT906.c:48:6:restart_HWT906	32	static
+../Core/Src/HWT906.c:63:6:rearrange_frame	32	static
+../Core/Src/HWT906.c:88:6:process_frame	40	static

@@ -1,0 +1,4 @@
+../Core/Src/HWT906.c:31:6:angle_referenc	1
+../Core/Src/HWT906.c:48:6:restart_HWT906	1
+../Core/Src/HWT906.c:63:6:rearrange_frame	6
+../Core/Src/HWT906.c:88:6:process_frame	9

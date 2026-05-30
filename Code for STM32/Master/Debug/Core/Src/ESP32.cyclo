@@ -1,0 +1,5 @@
+../Core/Inc/ESP32.h:15:23:ring_increase	1
+../Core/Src/ESP32.c:18:10:Modbus_CRC16	4
+../Core/Src/ESP32.c:41:6:Send_Data_To_ESP32	1
+../Core/Src/ESP32.c:93:6:Process_VS_frame	25
+../Core/Src/ESP32.c:194:6:Read_And_Process_VSData	12

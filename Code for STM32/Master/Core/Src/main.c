@@ -1,24 +1,24 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "ESP32.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
@@ -66,51 +66,39 @@ FDCAN_RxHeaderTypeDef RxHeader;
 
 //
 const float f_base_Ts = 0.00005f;	//PWM isr frequency - 20kHz
-const float f_theta_Ts = 0.004f;		//Sampling frequency of the current control loop - 10kHz
-		//Sampling frequency of the "gear shaft speed" control loop - 20Hz
+const float f_theta_Ts = 0.004f;//Sampling frequency of the current control loop - 10kHz
+//Sampling frequency of the "gear shaft speed" control loop - 20Hz
 const float f_Gear_Ratio = 19.2f;	//Gear box reduced speed ratio of motor
 const float f_Vbus_Nom = 24.0f;		//Norminal dc bus voltage - V
-float f_Ti_Spd = 0.2;//0.2 						//second
-float Tf_PID = 0.01;//0.01							//second
+float f_Ti_Spd = 0.2;		//0.2 						//second
+
 /*uart data*/
 usartData usart4_Tx, usart4_Rx; 		//RS485
 usartData usart5_Tx, usart5_Rx; 		//NEXTION
-/*Timer variable*/
-uint16_t tim10msTick;
+
 //Quadrature Encoder
-									
+
 uint8_t First_Cycle_Flag = 0;
 // HWT906
 #define  RX_SIZE 33
 uint8_t TxData[8];
 uint32_t TxMailbox;
 uint8_t RxData[RX_SIZE];
-uint8_t rxBuffer[RX_SIZE] = {0};
-uint8_t rxBuffer_HWT901[RX_SIZE] = {0};
+uint8_t rxBuffer[RX_SIZE] = { 0 };
 HWT906 HWT906_data;
-HWT901 HWT901_data;
 extern float angle_pitch;
-float angle_psi_1=0.00f;
-int start=0, control=0;
+float angle_psi_1 = 0.00f;
+volatile uint8_t control = 0;
 // CAN
 SP_CAN can_sp;
 GET_CAN can_get;
-// Filter
-KA_Filter kf;
-// PID
-extern cPI pid_x;;
-extern cPI pid_theta;
-extern cPI pid_psi;
-extern cPD pd_x;
-extern cPD pd_theta;
-extern cPD pd_psi;
-//ESP32
-ESP32 esp32;
-uint8_t t_esp32;
-uint8_t frame[19] ;
+
+#define COMBINE_2BYTES(high, low) ((int16_t)(((int16_t)(high) << 8) | (low)))
+float pi = 3.14159265f;
+uint8_t RS485_frame[50];
 // HSMC
 TWBMR parameter_TWBMR;
-HSMC control_hsmc,control_smc;
+HSMC control_hsmc, control_smc;
 F f_funtion;
 G g_funtion;
 // Ramp
@@ -137,9 +125,32 @@ static void MX_UART8_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void Toggle_LED(){
-	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_2);
-	HAL_Delay(500);
+
+void ExitRun0Mode(void)
+{
+	// Hàm rỗng để fix lỗi Linker của file startup
+}
+
+// Hàm nháy led
+void Toggle_Led(uint8_t led_number)
+{
+	static uint8_t TimeTick1 = 0;
+	static uint8_t TimeTick2 = 0;
+	if (led_number == 1)
+	{
+		if (++TimeTick1 == 100)
+		{
+			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_2);
+			TimeTick1 = 0;
+		}
+	} else if (led_number == 2)
+	{
+		if (++TimeTick2 == 100)
+		{
+			HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_3);
+			TimeTick2 = 0;
+		}
+	}
 }
 /* USER CODE END 0 */
 
@@ -184,116 +195,61 @@ int main(void)
   MX_USART6_UART_Init();
   MX_UART8_Init();
   /* USER CODE BEGIN 2 */
-//	HAL_Delay(1000);
+
 	FDCAN_Config();
-// UART-HWT906
-//angle_referenc();
-  HAL_UART_Receive_DMA(&huart7, rxBuffer, RX_SIZE);
-  HAL_Delay(1000);
-		HWT901_request();
-		HAL_Delay(5);
-		process_HWT901(&HWT901_data,rxBuffer_HWT901);
-//		HAL_UARTEx_ReceiveToIdle_DMA(&huart8, rxBuffer,29);
-//    angle_psi_1=HWT901_data.angle.z*3.1415926f/180.0f;
+
+// Nhận dữ liệu IMU
+	HAL_UART_Receive_DMA(&huart7, rxBuffer, RX_SIZE);
+	HAL_Delay(1000);
+
 // Timer interup
-HAL_TIM_Base_Start_IT(&htim5);
-// Filter
-// KA_init(&kf,f_theta_Ts,0.001f,0.003f,0.1f,0.1f,HWT906_data.angle.x,HWT906_data.angular_velocity.x);
- //SIN/COS
-init_lookup_table();
-// RS485
-HAL_GPIO_WritePin(GPIOD,GPIO_PIN_4,GPIO_PIN_SET);
-// PID
-		float KP_x=0;  // 1200
-		float KI_x=0;  //200
-		float KD_x=0;  //20
-		float f_PID_Ts = 0.005f; 
-		set_PID(&pid_x,KP_x,KI_x,KD_x,100,f_PID_Ts,40,-40);
-		float KP_theta=25; // 25
-		float KI_theta=0;  //0
-		float KD_theta=15;  //5
-		f_PID_Ts = 0.0025f; 
-		set_PID(&pid_theta,KP_theta,KI_theta,KD_theta,100,f_PID_Ts,40,-40);
-		float KP_psi=100;  //100
-		float KI_psi=0;  //5
-		float KD_psi=5;  //0
-		f_PID_Ts=0.0025f;
-		set_PID(&pid_psi,KP_psi,KI_psi,KD_psi,100,f_PID_Ts,40,-40);
-//init(cPD *pPID, mode,  Ts, K_p, K_i, K_d,  N, max,  min)
-		PID_init(&pd_theta,P_I_D,f_PID_Ts,50,0,5,1000,40,-40);
-		PID_init(&pd_psi,P_I_D,f_PID_Ts,0,0,0,10,40,-40);
-		// HSMC
-		TwoWBMR_Init(&parameter_TWBMR);
-		HSMC_init(&control_hsmc);
-		control_hsmc.c1=30.0f;
-		control_hsmc.c2=200.0f;
-		control_hsmc.k2=5.0f;
-		control_hsmc.lambda1=0.2f;
-		control_hsmc.beta1=0.8f;
-		control_hsmc.C3=1.0f;
-		control_hsmc.ETA2=12.0f;
-		control_hsmc.ETA3=2.0f;
-		control_hsmc.K3=1.0f;
-		//SMC
-		control_smc.c1=20.0f;
-		control_smc.c2=400.0f;
-		control_smc.C3=10.0f;
-		control_smc.ETA1=1.0f;
-		control_smc.ETA2=20.0f;
-		control_smc.ETA3=1.0f;
-		control_smc.k1=2.0f;
-		control_smc.k2=10.0f;
-		control_smc.k3=10.0f;
-		HAL_Delay(3000);
-		control=1;
+	HAL_TIM_Base_Start_IT(&htim5);
+
+// SIN_COS
+	init_lookup_table();
+
+// Khởi tao thông số vật lý
+	TwoWBMR_Init(&parameter_TWBMR);
+
+// SMC
+	control_smc.c1 = 20.0f;
+	control_smc.c2 = 400.0f;
+	control_smc.c3 = 10.0f;
+	control_smc.ETA1 = 1.0f;
+	control_smc.ETA2 = 20.0f;
+	control_smc.ETA3 = 1.0f;
+	control_smc.k1 = 2.0f;
+	control_smc.k2 = 10.0f;
+	control_smc.k3 = 10.0f;
+	HAL_Delay(3000);
+
+// Nhận dữ liệu ESP32
+	HAL_UARTEx_ReceiveToIdle_DMA(&huart6, rx_frame, sizeof(rx_frame));
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//		uint8_t frame[3];
-//		frame[1]=0x11;
-//		HAL_UART_Transmit(&huart2, frame,3,200);
-//		HAL_Delay(10);
-//		HAL_UART_Transmit_DMA(&huart8,rxBuffer,RX_SIZE);
-//		CreateAndSendFrame(&huart6,0x01,&HWT901_data,&can_sp,&can_get,frame);	
-		HAL_UART_Receive_DMA(&huart7, rxBuffer, RX_SIZE);
-		HWT901_request();
-		HAL_Delay(5);
-
-//		process_HWT901(&HWT901_data,rxBuffer_HWT901);
-//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET);
-////		HAL_UART_Transmit(&huart8, cmd_request, sizeof(cmd_request),100);
-////		HAL_Delay(10);
-//		while (HAL_UART_Transmit(&huart8, cmd_request, sizeof(cmd_request),100) == HAL_OK)
-//			{
-////		HAL_Delay(10);
-//		HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET);
-//		HAL_UART_Receive(&huart8, rxBuffer,30,1000);
-//		HAL_Delay(10);
-//		break;
-//		
-//	}
-//		HAL_UART_Receive_DMA(&huart8, rxBuffer, 12);
-		
-//		HAL_UART_Receive_DMA(&huart7, rxBuffer, RX_SIZE);
-//		can_sp.w1=HWT906_data.angle.x;
-//		can_sp.w2=HWT906_data.angle.y;
-//		send_via_can(&can_sp);
-//		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_4);
-//send_rs485(0x10,0x11,0.5,0.5,frame);
-if(t_esp32)
-{
-		CreateAndSendFrame(&huart6,0x01,&HWT906_data,&HWT901_data,&can_sp,&can_get,frame, &parameter_TWBMR);	
-	  t_esp32=0;
+	while (1)
+	{
+		// Xử lý lệnh được truyền xuống
+		if (VS_head != VS_tail)
+		{
+			Read_And_Process_VSData();
+		}
+		// Tạo và gửi dữ liệu lên
+		if (tx_esp32) // T = 50 ms
+		{
+			Send_Data_To_ESP32(&huart6, &HWT906_data, &can_sp, &can_get, tx_frame);
+			tx_esp32 = 0;
+		}
+	}
 }
-  }
   /* USER CODE END 3 */
-}
 
 /**
   * @brief System Clock Configuration
@@ -405,7 +361,6 @@ static void MX_FDCAN2_Init(void)
   /* USER CODE BEGIN FDCAN2_Init 2 */
 
 //	  FDCAN_FilterTypeDef sFilterConfig;
-
 //  /* Configure Rx filter */
 //	sFilterConfig.IdType = FDCAN_STANDARD_ID;  // config enable stand_mode(11 byte) 
 //	sFilterConfig.FilterIndex = 0;
@@ -422,7 +377,6 @@ static void MX_FDCAN2_Init(void)
 //  {
 //    Error_Handler();
 //  }
-	
   /* USER CODE END FDCAN2_Init 2 */
 
 }
@@ -767,8 +721,8 @@ static void MX_DMA_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
@@ -782,7 +736,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_11|LED1_Pin|LED2_Pin|GPIO_PIN_4, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_11|LED1_Pin|LED2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PE2 */
   GPIO_InitStruct.Pin = GPIO_PIN_2;
@@ -797,15 +751,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PD11 LED1_Pin LED2_Pin PD4 */
-  GPIO_InitStruct.Pin = GPIO_PIN_11|LED1_Pin|LED2_Pin|GPIO_PIN_4;
+  /*Configure GPIO pins : PD11 LED1_Pin LED2_Pin */
+  GPIO_InitStruct.Pin = GPIO_PIN_11|LED1_Pin|LED2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
@@ -848,15 +802,14 @@ void MPU_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1)
+	{
+	}
   /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.

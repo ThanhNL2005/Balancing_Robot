@@ -1,0 +1,2 @@
+../Core/Src/CAN.c:28:6:FDCAN_Config	40	static
+../Core/Src/CAN.c:62:6:HAL_FDCAN_RxFifo0Callback	32	static

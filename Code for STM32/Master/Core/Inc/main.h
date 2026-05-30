@@ -41,8 +41,8 @@ extern "C" {
 /**********************************************************************************************/
 typedef enum
 {
-	ACC, 
-	RUN, 
+	ACC,
+	RUN,
 	DEC
 }RAMP_STATE;
 /**********************************************************************************************/
@@ -61,7 +61,7 @@ typedef struct
 //PI Controller
 typedef struct
 {
-	float Kp, TI,Ki,Kd;										//Controller parameters	
+	float Kp, TI,Ki,Kd;										//Controller parameters
 	float Ks, D;										//Ks: Anti-windup Gain; D = 1-Ts/TI
 	float Umax, Umin, Usk, Usk_1, Uk, Uk_1;	//Control signal
 	float Ek, Ek_1,Ek_2, Esk, Esk_1;			//Error
@@ -71,10 +71,10 @@ typedef struct
 //PI Controller
 typedef struct
 {
-	float Kp,N,Ki,Kd;										//Controller parameters	
-	float T;		
+	float Kp,N,Ki,Kd;										//Controller parameters
+	float T;
 	float alpha, beta;      // ph?c v? t�nh h? s?
-	float b0, b1, b2;       // h? s? s?	
+	float b0, b1, b2;       // h? s? s?
 	float Umax, Umin,Uk, Uk_1, UP,UI,UI_1,UD,UD_1;	//Control signal
 	float Ek, Ek_1,Ek_2, Esk, Esk_1;			//Error
 	float Ts;												//Sampling time
@@ -101,12 +101,12 @@ typedef struct
 	uint8_t frameLength, groupID, senderAddr, receiverAddr, messType, dataLength;
 	uint16_t messCount;
 	//Data payload
-	
-	//State flow 
+
+	//State flow
 	uint8_t STATE;
 	uint8_t RxFlag;
 	uint8_t rxByte, rxPointer;
-	uint16_t timeOut; 
+	uint16_t timeOut;
 }usartData;
 /**********************************************************************************************/
 
@@ -116,17 +116,22 @@ typedef struct
 
 // HWT906
 /* data HWT906*/
-typedef struct {
-    struct {
+typedef struct
+{
+	// Tọa đô
+    struct
+	{
         float x;
         float y;
         float z;
     } acceleration, angular_velocity, angle;
-		struct{
+    // Trạng thái
+	struct
+	{
 		uint8_t DONE;
 		uint8_t ERROR;
-		} STATE;
-} HWT906,HWT901;
+	} STATE;
+} HWT906;
 
 typedef struct{
   float thetaSP;
@@ -134,13 +139,12 @@ typedef struct{
 } THETA;
 
 // CAN
-
-
 typedef struct{
-  double w1;
-  double w2;
-	uint8_t data[8];
+  float w1; //Vận tốc góc bánh 1
+  float w2; //Vận tốc góc bánh 2
+  uint8_t data[8];
 } SP_CAN,GET_CAN;
+
 // Filter
 typedef struct {
     float dt;
@@ -152,48 +156,45 @@ typedef struct {
 } KA_Filter;
 // HSMC
 typedef struct {
-    float mB;   // kh?i lu?ng c?a th?n con l?c
-    float l;    // chi?u d?i con l?c
-    float r;    // b?n k?nh b?nh xe
-    float mW;   // kh?i lu?ng m?i b?nh xe
-    float d;    // kho?ng c?ch gi?a 2 b?nh xe
-    float g;    // gia t?c tr?ng tru?ng
-    float I1;   // moment qu?n t?nh c?a th?n con l?c quanh tr?c d
-    float I2;   // moment qu?n t?nh c?a th?n con l?c quanh tr?c l
-    float I3;   // moment qu?n t?nh tuong t? I1 (n?u c?n thi?t)
-    float J;    // moment qu?n t?nh c?a m?i b?nh xe
-    float K;    // moment qu?n t?nh b? sung c?a m?i b?nh xe
+    float mB;   // khối lượng thân con lắc
+    float l;    // chiều dài con lắc
+    float r;    // bán kính bánh xe
+    float mW;   // khối lượng mỗi bánh xe
+    float d;    // khoảng cách giữa hai bánh xe
+    float g;    // gia tốc trọng trường
+    float I1;   // moment quán tính của thân con lắc quanh trục d
+    float I2;   // moment quán tính của thân con lắc quanh trục l
+    float I3;   // moment quán tính của thân con lắc quanh trục d
+    float J;    // moment quán tính của mỗi bánh xe
+    float K;    // moment quán tính bổ sung của mỗi bánh xe
 } TWBMR;
 typedef struct{
-  float f1;
-	float f2;
-	float f3;
+    float f1;
+    float f2;
+    float f3;
 }F;
 typedef struct{
-  float g1;
+    float g1;
 	float g2;
 	float g3;
 }G;
 typedef struct {
-    // parameter system
+    // parameter system - Thông số hệ thống
     float x1;
     float x2;
     float x3;
     float x4;
     float x5;
     float x6;
-    
-    // parameter control
-    float c1;       // V? d?: du?ng tru?t c?a x
-    float c2;       // V? d?: du?ng tru?t c?a theta
-    float k1,k2,k3;       // ?i?u khi?n chuy?n m?ch
+
+    // parameter control - Thông số bộ điều khiển
+    float c1, c2, c3;       // a1, a2, a3
+    float k1, k2, k3;
+    float ETA1, ETA2, ETA3; // beta1, beta2, beta3
     float lambda1;
     float beta1;
-    float C3;       // ?u?ng tru?t c?a psi
-    float ETA1,ETA2;
-    float ETA3;
     float K3;
-    
+
     // error
     float e1;
     float e2;
@@ -201,24 +202,25 @@ typedef struct {
     float e4;
     float e5;
     float e6;
-    
+
     // sliding face
     float s1;
     float s2;
     float s3;
     float s;
-    
+
     // output
     float ueq1;
     float ueq2;
     float usw;
-		float u_x,u_theta,u_psi;
+	float u_x, u_theta, u_psi;
     float u1;
     float u2;
 } HSMC,SMC;
 // ESP32
 typedef struct {
-uint16_t rec_mode;		
+uint8_t rx;
+uint8_t tx;
 }ESP32;
 /**********************************************************************************************/
 /* USER CODE END ET */
@@ -237,12 +239,13 @@ uint16_t rec_mode;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-//timer
+extern UART_HandleTypeDef huart6;
 
 // CONTROL
+extern volatile uint8_t control;
 void control_theta_pid(void);
 void control__pid(void);
-void set_PID(cPI *pPID,float kp, float ki, float kd, float n,    float ts,   float umax, float umin) ;
+void set_PID(cPI *pPID,float kp, float ki, float kd, float n,    float ts,   float umax, float umin);
 float PID_control(cPI *pPID, float setpoint, float measure);
 void vPI_Init(cPI *pPI, float TI, float Lambda, float Ts, float MaxSP, float Usat);
 float fPI_Run(cPI *pPI, float Ref, float Fb);
@@ -260,7 +263,7 @@ float KA_update(KA_Filter *kf, float angle_meas, float gyro_meas);
 void angle_referenc(void);
 void restart_HWT906(void);
 void read_frame(uint8_t *buffer, uint8_t size);
-void rearrange_frame(uint8_t *dmaBuffer, uint8_t *orderedBuffer);
+void rearrange_frame(const uint8_t *dmaBuffer, uint8_t *orderedBuffer);
 void process_frame(HWT906 *hwt906_data, uint8_t *data);
 
 // HSMC
@@ -268,31 +271,26 @@ void TwoWBMR_Init(TWBMR* robot);
 void HSMC_init(HSMC *state);
 void HSMC_control(TWBMR *param, HSMC *hsmc, F *f, G *g);
 void SMC_control(TWBMR *param, SMC *smc, F *f, G *g);
+extern HSMC control_smc;
+extern TWBMR parameter_TWBMR;
+extern HSMC control_smc;
+extern F f_funtion;
+extern G g_funtion;
 // sin/cos
-#define STEP 0.00017453       // 
-#define TABLE_SIZE 36000    // 
+#define STEP 0.00017453
+#define TABLE_SIZE 36000
 
-
-static float sin_table[TABLE_SIZE];
-static float cos_table[TABLE_SIZE];
+extern float sin_table[TABLE_SIZE];
+extern float cos_table[TABLE_SIZE];
 
 void init_lookup_table(void);
 float lookup_sin(float radian);
 float lookup_cos(float radian);
 // RS485
 void send_rs485(uint8_t sender, uint8_t receiver, float f1, float f2,uint8_t *frame);
-// HWT901
-void HWT901_request(void);
-void calis_angle(void);
-void process_HWT901(HWT901 *hwt901,uint8_t *data);
-uint16_t Modbus_CRC16(uint8_t *data, uint16_t length);
-//ESP32
-void CreateAndSendFrame(UART_HandleTypeDef *huart, uint8_t id,HWT906 *hwt906_data ,HWT901 *hwt901_data,SP_CAN *can,GET_CAN *get_can,uint8_t *frame, TWBMR *robot);//Ramp
-float fRampGen(RAMP *pRamp,float SP, float delatl);
-void vRamp_Config(RAMP *pRamp, uint16_t Tacc_Sec, uint16_t Tdec_Sec, float inputMin, float inputMax, float Ts);
-float fRampFcnGen(float SP, RAMP *pRamp);
-void ESP_to_STM(uint8_t *frame,cPI *x,cPI *theta,cPI *psi,ESP32 *esp);
 
+/******************************************************************************/
+void Toggle_Led(uint8_t led_number);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
