@@ -2,348 +2,288 @@
 #include <WiFi.h>
 #include <HardwareSerial.h>
 
-/**********************************************************/
-// Khởi tạo USART0
-HardwareSerial mySerial(0); // USART0
-/**********************************************************/
-// Định nghĩa frame mẫu dữ liệu nhận từ STM32 
-#define START_BYTE 0xAA
-#define END_BYTE 0x55
-#define CHECKSUM 0xFF
-#define ID 0x01
-#define LENGTH 0x08
-#define SAMPLING_PERIOD_LowByte 0x01
-#define SAMPLING_PERIOD_HighByte 0x00
-#define rxLength 19 
+/******************************************************************************/
+// Khởi tạo UART0
+HardwareSerial mySerial(0);
+// Khởi tạo handle: UART Mutex
+SemaphoreHandle_t UART_Mutex = NULL;
+// Khởi tạo handle: ESP-NOW Queue
+QueueHandle_t ESPNOW_Queue = NULL;
+// Khởi tạo handle: ESP-NOW Task
+TaskHandle_t ESPNOW_Task = NULL;
 
-#define USART_READING 1
-#define USART_WAIT 0
-/**********************************************************/
-// Định nghĩa frame nhận qua ESP-Now từ ESP32 Master
-#define StartByteFromMaster 0xBB
-#define EndByteFromMaster 0x66
-#define longFrameLength 11
-#define shortFrameLength 8
-uint8_t ESPBuffer[longFrameLength];
-uint8_t bufferIndex = 0;
-bool receivingFrame = false;
-uint8_t FrameSize_expected = shortFrameLength;
-/**********************************************************/
-// Địa chỉ MAC của thiết bị nhận
-//uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}; //Master: {0xA0, 0xDD, 0x6C, 0x02, 0xCF, 0x94}
-uint8_t broadcastAddress[] = {0xA0, 0xDD, 0x6C, 0x02, 0xCF, 0x94};
-esp_now_peer_info_t peerInfo; // Bien luu thong tin thiet bi nhan
-uint8_t espNow_RxFlag;  //Receive interrupt flag
-/*******************************************************************************************/
-// Cấu trúc dữ liệu nhận từ STM32
+/******************************************************************************/
+// Header: Giao tiếp với STM32 qua UART0
+#define UPLINK_START_BYTE 0xAA
+#define END_BYTE 0xED
+#define rxLength 18
+#define UART_READING 1
+#define UART_WAIT 0
+typedef struct
+{
+  byte rxBuff[rxLength];
+  uint8_t rxIndex;
+  uint8_t rxByte;
+  uint8_t STATE;
+} UART_RxData_t;  // Struct của biến thực hiện nhận dữ liệu UART0
+UART_RxData_t UART_Rx_Buffer;
+UART_RxData_t UART_Rx;     
+uint8_t gRxSTM32Flag = 0;  // Cờ báo nhận thành công dữ liệu STM32
+
 #pragma pack(1)
 typedef struct
 {
-  uint8_t firstCheck = 24;
+  int8_t startCheckValue;
   int16_t xAngle;
   int16_t zAngle;
   int16_t xAngularVelocity;
   int16_t zAngularVelocity;
   int16_t xCoordinate;
   int16_t leftWheelTorque;
-  int16_t rightWheelTorque; // Tần số lấy mẫu của vi xử lý trên STM32
-  uint8_t lastCheck = 25;
-} STM32_Data_Received;
+  int16_t rightWheelTorque;
+  int8_t endCheckValue;
+} STM32_Data_t;  // Cấu trúc dữ liệu của STM32 Data
+STM32_Data_t stm32DataRC;
 #pragma pack()
-STM32_Data_Received stm32DataRC; 
-/*******************************************************************************************/
-typedef struct
+
+/******************************************************************************/
+// Header: Giao tiếp với ESP32 Master qua ESP-NOW
+#define max_frame_len 12
+#define longFrameLength 12
+#define shortFrameLength 9
+#define MAC_LEN 6
+#define STM32DATA_ID 0x04  // Mã từ ESP32 Master yêu cầu gửi dữ liệu STM32 lên
+#define EMPTY_ID 0xEE      // Mã từ ESP32 Slave báo trống dữ liệu
+
+#pragma pack(1)
+struct
 {
-  byte rxBuff[rxLength];
-  byte txBuff[100];
-  uint8_t RxFlag;
-  uint8_t frameStart, frameEnd, frameLength, groupID, senderAddr, receiverAddr, messType, dataLength;
-  uint16_t messCount, rxPointer;
-  uint8_t rxByte;
-  uint8_t STATE;
-} usartData;
-usartData usart_Tx, usart_Rx;
-/****************** Kiem tra checksum doi voi frame du lieu nhan tu STM32 ************************/
-uint16_t Modbus_CRC16(uint8_t* data, uint16_t frameLength, uint16_t pos_start, uint16_t pos_end)
-{
+  uint8_t firstCheck = UPLINK_START_BYTE;
+  uint8_t ID_Number = EMPTY_ID;
+  uint8_t lastCheck = END_BYTE;
+} Empty_Frame; // Frame gửi cho Master khi không đọc được dữ liệu STM32
+#pragma pack()
+
+uint8_t master_address[] = { 0xA0, 0xDD, 0x6C, 0x02, 0xCF, 0x94 };  // Địa chỉ MAC của thiết bị nhận (ESP32 Master)
+esp_now_peer_info_t peerInfo;                                       // Biến lưu thông tin thiết bị nhận
+
+/******************************************************************************/
+// Hàm tính mã Modbus CRC16
+uint16_t Modbus_CRC16(uint8_t *data, uint16_t Length) {             // Số phần tử trong data cần tính mã CRC
   uint16_t crc = 0xFFFF;
-  for (uint16_t pos = pos_start; pos <= pos_end; pos++){
+  for (uint16_t pos = 0; pos < Length; pos++) {
     crc ^= (uint16_t)data[pos];
-    for (uint8_t i=0; i<8; i++) {
+    for (uint8_t i = 0; i < 8; i++) {
       if (crc & 0x0001) {
         crc >>= 1;
         crc ^= 0xA001;
-      }
-      else {
+      } else {
         crc >>= 1;
       }
     }
   }
   return crc;
 }
-uint8_t checksum = 0;
-/****************************************************************************************/
-void usart_DataRead(usartData *pRxData)  // Save received data (Lưu dữ liệu nhận được)
-{
-  int i = 0;
-  while (mySerial.available() > 0)  // Check uart data (Kiểm tra có byte gửi qua UART không)
-  {
+
+/******************************************************************************/
+// Hàm đọc dữ liệu từ STM32 -> Lưu vào UART_Rx
+void Read_STM32_Data(UART_RxData_t *pRxData) {
+  if (pRxData == NULL) {
+    return;
+  }
+  while (mySerial.available() > 0) {
     pRxData->rxByte = mySerial.read();
-    switch (pRxData->STATE)
-    {
-      case USART_WAIT:
-      {
-        pRxData->rxBuff[0] = pRxData->rxByte;  // Read first byte
-        if (pRxData->rxBuff[0] == START_BYTE)
+    switch (pRxData->STATE) {
+      case UART_WAIT:
         {
-          pRxData->STATE = USART_READING;           // Switch to Reading state
-          // Serial.println("Đã chuyển sang trạng thái Reading");
-          pRxData->rxPointer = 1;
-        }
-        else  // Fail (Byte đầu tiên không phải START_BYTE)
-        {
-          //Serial.println("Không thể chuyển sang trạng thái Reading");
-          pRxData->rxPointer = 0;         //Reset pointer
-        }
-        break;
-      }
-      case USART_READING:
-      {
-        pRxData->rxBuff[pRxData->rxPointer] = pRxData->rxByte;  //Read data
-        if (pRxData->rxPointer == rxLength - 1)
-        {
-          if (pRxData->rxBuff[pRxData->rxPointer] == END_BYTE)
-          {
-            // Save data
-            // Serial.println("Frame đọc được là: ");
-            for (int i = 0; i <= pRxData->rxPointer; i++) 
-            {
-              // Serial.printf("%02X ", pRxData->rxBuff[i]);
-            }
-            // Serial.println("\n");
-            // Checksum
-            // checksum = Modbus_CRC16(pRxData->rxBuff, rxLength, 0, rxLength-3);
-            // if (checksum == pRxData->rxBuff[rxLength-2])
-            // {
-            //   // Checksum đúng. Bật cờ thông báo: đã nhận xong dữ liệu từ xe gửi lên
-            //   // Serial.println("Checksum đúng. Hoàn thành nhận dữ liệu.");
-            //   pRxData->RxFlag = 1;
-            // }
-            // else
-            // {
-            //   // Checksum sai. Reset toàn bộ frame, đặt cờ RxFlag về bằng 0, trở lại trạng thái chờ
-            //   // Serial.println("Checksum sai. Frame sẽ bị loại bỏ.");
-            //   pRxData->rxPointer = 0;
-            //   pRxData->RxFlag = 0;
-            //   for (i = 0; i <= pRxData->rxPointer; i++)
-            //   {
-            //     pRxData->rxBuff[i] = 0;
-            //   }
-            // } 
-            pRxData->RxFlag = 1;
+          pRxData->rxBuff[0] = pRxData->rxByte;  // Dò start byte để lấy điểm bắt đầu đọc
+          if (pRxData->rxBuff[0] == UPLINK_START_BYTE) {
+            pRxData->STATE = UART_READING;  // Chuyển sang trạng thái đọc
+            // Serial.println("Đã chuyển sang trạng thái Reading");
+            pRxData->rxIndex = 1;
+          } else {
+            // Byte đầu tiên không phải UPLINK_START_BYTE
+            //Serial.println("Không thể chuyển sang trạng thái Reading");
           }
-          else  //Fail (Frame bị sai mất END_BYTE) -> Reset buffer, pointer and move to WAIT state
-          {
-            // Serial.println("Không thể tìm được END_BYTE");
-            pRxData->rxPointer = 0;
-            pRxData->RxFlag = 0;
-            for (i = 0; i <= pRxData->rxPointer; i++)
-            {
-              pRxData->rxBuff[i] = 0;
-            }
-          }
-          pRxData->STATE = USART_WAIT;
+          break;
         }
-        else 
+      case UART_READING:
         {
-          pRxData->rxPointer = pRxData->rxPointer + 1;    //Increse the pointer
-          if (pRxData->rxPointer > rxLength-1)            //Fail
-          {
-            pRxData->rxPointer = 0;
-            pRxData->RxFlag = 0;
-            for (i = 0; i < rxLength; i++)
-            {
-              pRxData->rxBuff[i] = 0;
+          pRxData->rxBuff[pRxData->rxIndex] = pRxData->rxByte;  // Lưu từng byte
+          // Kiểm tra end byte
+          if (pRxData->rxIndex == rxLength - 1) {
+            if (pRxData->rxBuff[pRxData->rxIndex] == END_BYTE) {
+              /* Serial.println("Frame đọc được là: ");
+              for (int i = 0; i <= pRxData->rxIndex; i++) {
+                 Serial.printf("%02X ", pRxData->rxBuff[i]);
+              }
+              Serial.println("\n");*/
+              // Kiểm tra Checksum
+              uint16_t CRC16 = Modbus_CRC16(pRxData->rxBuff, rxLength - 3);
+              uint8_t Low_Byte_CRC16 = (uint8_t)(CRC16 & 0xFF);
+              uint8_t High_Byte_CRC16 = (uint8_t)((CRC16 >> 8) & 0xFF);
+              if (Low_Byte_CRC16 == pRxData->rxBuff[rxLength - 3] && High_Byte_CRC16 == pRxData->rxBuff[rxLength - 2]) {
+                // Checksum đúng -> Bật cờ thông báo và reset state machine
+                if (xSemaphoreTake(UART_Mutex, portMAX_DELAY) == pdTRUE) {
+                  memcpy(UART_Rx.rxBuff, pRxData->rxBuff, rxLength);  // Lưu vào UART_Rx
+                  gRxSTM32Flag = 1;                                   // Dựng cờ báo đọc dữ liệu từ STM32 thành công
+                  xSemaphoreGive(UART_Mutex);
+                }
+                pRxData->rxIndex = 0;
+                pRxData->STATE = UART_WAIT;
+                // Serial.println("Checksum đúng. Hoàn thành nhận dữ liệu.");
+              } else {
+                // Checksum sai -> Reset state machine
+                pRxData->rxIndex = 0;
+                pRxData->STATE = UART_WAIT;
+                //Serial.println("Checksum sai. Frame bị loại bỏ.");
+              }
+            } else {
+              // Frame bị mất END_BYTE -> Reset state machine
+              pRxData->rxIndex = 0;
+              pRxData->STATE = UART_WAIT;
+              // Serial.println("Không thể tìm được END_BYTE");
             }
-            pRxData->STATE = USART_WAIT;
+          } else {
+            pRxData->rxIndex = pRxData->rxIndex + 1;  // Tăng index của mảng lưu
           }
+          break;
         }
-        break;
-      }
     }
   }
-  // Process receive data (Nếu có byte dữ liệu đến, xử lý byte đó)
 }
-/*******************************************************************************************/
-void espNowMasterSend(usartData *pRxData)
-{
-  stm32DataRC.xAngle = (int16_t)(pRxData->rxBuff[3] | (pRxData->rxBuff[4] << 8));   
-  stm32DataRC.zAngle = (int16_t)(pRxData->rxBuff[5] | (pRxData->rxBuff[6] << 8));   
-  stm32DataRC.xAngularVelocity = (int16_t)(pRxData->rxBuff[7] | (pRxData->rxBuff[8] << 8));   
-  stm32DataRC.zAngularVelocity = (int16_t)(pRxData->rxBuff[9] | (pRxData->rxBuff[10] << 8));   
-  stm32DataRC.xCoordinate = (int16_t)(pRxData->rxBuff[11] | (pRxData->rxBuff[12] << 8));   
-  stm32DataRC.leftWheelTorque = (int16_t)(pRxData->rxBuff[13] | (pRxData->rxBuff[14] << 8));   
-  stm32DataRC.rightWheelTorque = (int16_t)(pRxData->rxBuff[15] | (pRxData->rxBuff[16] << 8));
 
-  // Serial.println("Data received successfully from STM32!");
-  // Serial.print("x Angle = ");
-  // Serial.println(stm32DataRC.xAngle);
-  // Serial.print("z Angle = ");
-  // Serial.println(stm32DataRC.zAngle);
-  // Serial.print("x Angular Velocity = ");
-  // Serial.println(stm32DataRC.xAngularVelocity);
-  // Serial.print("z Angular Velocity = ");
-  // Serial.println(stm32DataRC.zAngularVelocity);
-  // Serial.print("x Coordinate = ");
-  // Serial.println(stm32DataRC.xCoordinate);
-  // Serial.print("Left Wheel Torque = ");
-  // Serial.println(stm32DataRC.leftWheelTorque);
-  // Serial.print("Right Wheel Torque = ");
-  // Serial.println(stm32DataRC.rightWheelTorque);
+/******************************************************************************/
+// Hàm callback khi nhận dữ liệu qua ESP-NOW
+void ESPNOW_callback(const esp_now_recv_info_t *esp_now_info, const uint8_t *esp_data, int data_len) {
+  // Kiểm tra danh tính nguồn gửi đến
+  if (memcmp(esp_now_info->src_addr, master_address, MAC_LEN)) {
+    return;
+  }
+  // Lưu dữ liệu vào ESPNOW Queue
+  if (data_len == shortFrameLength) {
+    uint8_t buff[max_frame_len] = { 0 };
+    memcpy(buff, esp_data, data_len);
+    xQueueSend(ESPNOW_Queue, buff, 0);
+  } else if (data_len == longFrameLength) {
+    xQueueSend(ESPNOW_Queue, esp_data, 0);
+  }
+}
 
-  // Gui goi du lieu nhan tu STM32 sang ESP32 Master
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&stm32DataRC, sizeof(stm32DataRC));
-  // if (result == ESP_OK) {
-  //   Serial.println("Dữ liệu gửi sang ESP32 Master thành công!");
-  // }
-  // else
-  // {
-  //   Serial.print("Không thể gửi dữ liệu sang ESP32 Master! Error code: ");
-  //   Serial.println(result);
-  // }
-}
-/*******************************************************************************************/
-// Ham callback khi nhan du lieu tu Master
-void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
-{
-  for (int i = 0; i < FrameSize_expected; i++)
-  {
-    uint8_t byte = incomingData[i];
-    if (!receivingFrame) {
-      if (byte == StartByteFromMaster) {
-        receivingFrame = true;
-        bufferIndex = 0; 
-        FrameSize_expected = shortFrameLength;
-        ESPBuffer[bufferIndex++] = byte;
-      }
-      else {
-        // Serial.println("Start byte từ frame của Master gửi bị sai!");
-        espNow_RxFlag = 0;
-      }
-    }
-    else {
-      if (bufferIndex == 3 && ESPBuffer[2] == 0x01) {
-        FrameSize_expected = longFrameLength;
-      }
-      ESPBuffer[bufferIndex++] = byte;
-      if (bufferIndex == FrameSize_expected) {
-        // Đủ byte, kiểm tra EndByte
-        if (ESPBuffer[FrameSize_expected - 1] == EndByteFromMaster) {
-          // Serial.println("Đã nhận EndByte");
-          espNow_RxFlag = 1;
-        }
-        else {
-          // Serial.println("Frame không hợp lệ (thiếu EndByte)");
-          espNow_RxFlag = 0;
-        }
+/******************************************************************************/
+// Hàm xử lý dữ liệu nhận từ ESP32 Master
+void Process_Master_Data(void *pvParameters) {
+  uint8_t ESP_Buffer[max_frame_len];
+  while (1) {
+    if (xQueueReceive(ESPNOW_Queue, ESP_Buffer, portMAX_DELAY) == pdTRUE) {
+      if (ESP_Buffer[1] == STM32DATA_ID) {
+        // Thực hiện lệnh: Gửi dữ liệu STM32 định kỳ lên cho Master
+        STM32Data_To_Master(&UART_Rx);
+      } else {
+        // Thục hiện lệnh: Chuyển tiếp gói tin từ WinForm (VS) xuống STM32
+        MasterData_To_STM32(ESP_Buffer);
       }
     }
   }
-  // Reset để nhận frame tiếp theo
-  receivingFrame = false;
-  bufferIndex = 0;
+  /*uxTaskGetStackHighWaterMark(NULL)*/  // Kiểm tra dung lượng stack thực tế mà Task sử dụng
 }
-/******************************************************************************/
-// Giải mã buffer từ Master
-void DecodeESPbuffer(uint8_t* buff, uint8_t buffSize){
-  if (buff[2] == 0x00){
-    int16_t temp = (int16_t)((buff[5] << 8) | buff[4]);
-    // Serial.println("Frame ngắn: loại dữ liệu, thứ tự cùng giá trị nhận được:");
-    // Serial.printf("%d, %d, %d\n", buff[1], buff[3], temp);
-    // Serial.println("Received full frame:");
-    for (int i = 0; i < buffSize; i++) {
-      // Serial.printf("%02X ", buff[i]);
-    }
-    // Serial.println();
-  }
-  else if (buff[2] == 0x01){
-    int16_t temp0 = (int16_t)((buff[4] << 8) | buff[3]);
-    int16_t temp1 = (int16_t)((buff[6] << 8) | buff[5]);
-    int16_t temp2 = (int16_t)((buff[8] << 8) | buff[7]);
-    // Serial.println("Frame dài: loại dữ liệu và các giá trị nhận được:");
-    // Serial.printf("%d, %d, %d, %d\n", buff[1], temp0, temp1, temp2);
-    // Serial.println("Received full frame:");
-    for (int i = 0; i < buffSize; i++) {
-      // Serial.printf("%02X ", buff[i]);
-    }
-    // Serial.println();
-  }
-} 
-/******************************************************************************/
-// Code gửi dữ liệu xuống STM32 (không được xoá đi)
-void SendToSTM32(uint8_t* buff, uint8_t buffSize)
-{
-  mySerial.write(buff, buffSize);
-}
-/******************************************************************************/
-void InitESPNow(void)
-{
-  espNow_RxFlag = 0;
 
-  if (esp_now_init() != ESP_OK)
-  {
+/******************************************************************************/
+// Hàm gửi dữ liệu STM32 lên Master
+void STM32Data_To_Master(UART_RxData_t *pRxData) {
+  if (xSemaphoreTake(UART_Mutex, portMAX_DELAY) == pdTRUE) {
+    if (gRxSTM32Flag) {
+      memcpy(&stm32DataRC, pRxData->rxBuff, sizeof(STM32_Data_t) - 1); // Bỏ lại 2 byte CRC
+      stm32DataRC.endCheckValue = END_BYTE;
+      // Serial.println("Data received successfully from STM32!");
+      // Serial.print("x Angle = ");
+      // Serial.println(stm32DataRC.xAngle);
+      // Serial.print("z Angle = ");
+      // Serial.println(stm32DataRC.zAngle);
+      // Serial.print("x Angular Velocity = ");
+      // Serial.println(stm32DataRC.xAngularVelocity);
+      // Serial.print("z Angular Velocity = ");
+      // Serial.println(stm32DataRC.zAngularVelocity);
+      // Serial.print("x Coordinate = ");
+      // Serial.println(stm32DataRC.xCoordinate);
+      // Serial.print("Left Wheel Torque = ");
+      // Serial.println(stm32DataRC.leftWheelTorque);
+      // Serial.print("Right Wheel Torque = ");
+      // Serial.println(stm32DataRC.rightWheelTorque);
+      gRxSTM32Flag = 0;
+      xSemaphoreGive(UART_Mutex);
+      // Gửi dữ liệu STM32 cho Master
+      esp_err_t resultA = esp_now_send(master_address, (uint8_t *)&stm32DataRC, sizeof(stm32DataRC));
+      // if (resultA == ESP_OK) {
+      //   Serial.println("Dữ liệu gửi sang ESP32 Master thành công!");
+      // }
+      // else
+      // {
+      //   Serial.print("Không thể gửi dữ liệu sang ESP32 Master! Error code: ");
+      //   Serial.println(resultA);
+      // }
+    } else {
+      xSemaphoreGive(UART_Mutex);
+      // Gửi frame báo trống dữ liệu cho Master
+      esp_err_t resultB = esp_now_send(master_address, (uint8_t *)&Empty_Frame, sizeof(Empty_Frame));
+    }
+  }
+}
+
+/******************************************************************************/
+// Hàm gửi dữ liệu từ Master xuống STM32
+void MasterData_To_STM32(uint8_t *buff) {
+  uint8_t buff_len = buff[2] == 0x00 ? shortFrameLength : longFrameLength;
+  mySerial.write(buff, buff_len);
+}
+
+/******************************************************************************/
+// Hàm khởi tạo ESP-NOW
+void InitESPNow(void) {
+  if (esp_now_init() != ESP_OK) {
     // Serial.println("Error initializing ESP-NOW");
     return;
   }
-  
-  // Dang ki ham callback gui du lieu tu Slave va nhan du lieu tu Master
-  esp_now_register_recv_cb((esp_now_recv_cb_t)OnDataRecv);
-  //esp_now_register_send_cb(OnDataSend);
-
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6); // Gan dia chi thiet bi nhan
-  peerInfo.channel = 0;                        // Su dung kenh Wifi mac dinh 0
-  peerInfo.encrypt = false;                    // Khong ma hoa
-
-  // Them thiet bi nhan
-  if (esp_now_add_peer(&peerInfo) != ESP_OK)
-  {
+  // Đăng ký hàm callback trong ESPNOW
+  esp_now_register_recv_cb((esp_now_recv_cb_t)ESPNOW_callback);
+  // Cấu hình ESP-NOW
+  memcpy(peerInfo.peer_addr, master_address, MAC_LEN);  // Gán địa chỉ thiết bị nhận
+  peerInfo.channel = 0;                                 // Sử dụng kênh Wifi mặc định 0
+  peerInfo.encrypt = false;                             // Không mã hoá
+  // Thêm thiết bị nhận (ESP32 Master)
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
     // Serial.println("Adding peer Failed");
     return;
   }
 }
-/*******************************************************************************************/
+
+/******************************************************************************/
 void setup() {
-  // Init Serial Monitor (Khởi tạo serial monitor)
+  // Khởi tạo trạng thái state machine
+  UART_Rx_Buffer.STATE = UART_WAIT;
+  // Khởi tạo serial monitor
   Serial.begin(115200);
-  usart_Rx.STATE = USART_WAIT;
-  usart_Rx.RxFlag = 0;
-  // Set device as a Wi-Fi Station (Thiết lập esp32 là một trạm thu phát wi-fi)
+  // Thiết lập esp32 là một trạm thu phát wi-fi
   WiFi.mode(WIFI_STA);
-  // Initialize ESP-NOW
-  InitESPNow();
-  // Initialize hardware USART
+  // Khởi tạo phần cứng UART0
   mySerial.begin(115200, SERIAL_8N1, 3, 1);
+  // Khởi tạo UART Mutex
+  UART_Mutex = xSemaphoreCreateMutex();
+  // Khởi tạo ESP-NOW Queue
+  ESPNOW_Queue = xQueueCreate(32, max_frame_len);
+  // Khởi tạo Task xử lý dữ liệu từ Master
+  xTaskCreatePinnedToCore(Process_Master_Data,
+                          "Xu ly du lieu Master",
+                          4096,  // Dung lượng stack 4096 bytes
+                          NULL,
+                          5,     // Độ ưu tiên 5
+                          &ESPNOW_Task,
+                          1);    // Chạy trên Core 1
+  // Khởi tạo ESP-NOW
+  InitESPNow();
 }
 
 void loop() {
-  // Nhận dữ liệu UART từ STM32 gửi lên
-  if (usart_Rx.RxFlag == 0)
-  {
-    usart_DataRead(&usart_Rx);
-  }
-  else
-  {
-    // Xử lý dữ liệu USART đã nhận đầy đủ
-    espNowMasterSend(&usart_Rx);
-    //Clear Rx Flag
-    usart_Rx.RxFlag = 0;
-  }
-
-  // Nhận dữ liệu ESP-NOW từ ESP32 Master gửi đến
-  if (espNow_RxFlag == 1)
-  {
-    DecodeESPbuffer(ESPBuffer, FrameSize_expected);
-    SendToSTM32(ESPBuffer, FrameSize_expected);
-    espNow_RxFlag = 0;
-  }
+  Read_STM32_Data(&UART_Rx_Buffer);
+  vTaskDelay(1);
 }
