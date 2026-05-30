@@ -1,0 +1,1 @@
+firmware_stm32f405rgt6_dcservo\startup_stm32f405xx.o: startup_stm32f405xx.s

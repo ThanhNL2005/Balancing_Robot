@@ -1,0 +1,141 @@
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\2WBMR_UI_ver2.exe.config
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\2WBMR_UI_ver2.exe
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\2WBMR_UI_ver2.pdb
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.csproj.AssemblyReference.cache
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\_2WBMR_UI_ver2.Properties.Resources.resources
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.csproj.GenerateResource.cache
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.csproj.CoreCompileInputs.cache
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.exe
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.pdb
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.Interfaces.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.System.Drawing.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Microsoft.IO.RecyclableMemoryStream.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Buffers.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.ComponentModel.Annotations.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Drawing.Common.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Memory.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Numerics.Vectors.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ZedGraph.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.xml
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Microsoft.IO.RecyclableMemoryStream.xml
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Buffers.xml
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Drawing.Common.pdb
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Drawing.Common.xml
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Memory.xml
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Numerics.Vectors.xml
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ZedGraph.xml
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\de\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\es\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\fr\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\hu\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\it\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ja\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\pt\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ru\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\sk\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\sv\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\tr\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\zh-cn\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\zh-tw\ZedGraph.resources.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI.2FA45AB0.Up2Date
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\_2WBMR_UI_ver2._2WBMR_UI_ver2.resources
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Newtonsoft.Json.dll
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Newtonsoft.Json.xml
+D:\WSR Lab\TwoWheelBalancingMobileRobot\Software\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\_2WBMR_UI_ver2.RobotSystemConfig.resources
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\2WBMR_UI_ver2.exe.config
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\2WBMR_UI_ver2.exe
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\2WBMR_UI_ver2.pdb
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.Interfaces.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.System.Drawing.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Newtonsoft.Json.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Buffers.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.ComponentModel.Annotations.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Drawing.Common.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Memory.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Numerics.Vectors.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ZedGraph.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.xml
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Microsoft.IO.RecyclableMemoryStream.xml
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Newtonsoft.Json.xml
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Buffers.xml
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Drawing.Common.pdb
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Drawing.Common.xml
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Memory.xml
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Numerics.Vectors.xml
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ZedGraph.xml
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\de\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\es\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\fr\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\hu\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\it\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ja\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\pt\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ru\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\sk\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\sv\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\tr\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\zh-cn\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\zh-tw\ZedGraph.resources.dll
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.csproj.AssemblyReference.cache
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\_2WBMR_UI_ver2._2WBMR_UI_ver2.resources
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\_2WBMR_UI_ver2.RobotSystemConfig.resources
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\_2WBMR_UI_ver2.Properties.Resources.resources
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.csproj.GenerateResource.cache
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.csproj.CoreCompileInputs.cache
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI.2FA45AB0.Up2Date
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.exe
+C:\Users\HIEU\Downloads\UI\Thesis Documents For Zip\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.pdb
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\2WBMR_UI_ver2.exe.config
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\2WBMR_UI_ver2.exe
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\2WBMR_UI_ver2.pdb
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.Interfaces.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.System.Drawing.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Microsoft.IO.RecyclableMemoryStream.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Newtonsoft.Json.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Buffers.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.ComponentModel.Annotations.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Drawing.Common.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Memory.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Numerics.Vectors.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ZedGraph.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\EPPlus.xml
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Microsoft.IO.RecyclableMemoryStream.xml
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\Newtonsoft.Json.xml
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Buffers.xml
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Drawing.Common.pdb
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Drawing.Common.xml
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Memory.xml
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Numerics.Vectors.xml
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ZedGraph.xml
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\de\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\es\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\fr\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\hu\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\it\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ja\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\pt\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\ru\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\sk\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\sv\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\tr\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\zh-cn\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\bin\Debug\zh-tw\ZedGraph.resources.dll
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.csproj.AssemblyReference.cache
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\_2WBMR_UI_ver2._2WBMR_UI_ver2.resources
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\_2WBMR_UI_ver2.RobotSystemConfig.resources
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\_2WBMR_UI_ver2.Properties.Resources.resources
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.csproj.GenerateResource.cache
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.csproj.CoreCompileInputs.cache
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI.2FA45AB0.Up2Date
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.exe
+D:\Original_2WBMB\Code for UI\2WBMR_User_Interface\2WBMR_UI_ver2\obj\Debug\2WBMR_UI_ver2.pdb

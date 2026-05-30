@@ -1,0 +1,5 @@
+File caculat_time là chương trình vẽ quỹ đạo mô phỏng,
+my_plot_figure là chương trình vẽ đồ thị các biến được mô phỏng,
+ve_do_thi_ket_qua là chương trình vẽ lại kết quả thu được trên giao diện, cần có file Excel sau khi giao diện 
+vẽ đồ thị xong,
+phải chạy xong chương trình simulink (.slx) mới có dữ liệu để chạy 2 chương trình caculat_time và my_plot_figure.

@@ -1,0 +1,68 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Dowload_Files\\Downloads\\Original_2WBMB\\Code for UI\\2WBMR_User_Interface\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B7CA42C9-A1E0-4D91-B8E6-3D9500EFE656}|2WBMR_UI_ver2\\2WBMR_UI_ver2.csproj|d:\\dowload_files\\downloads\\original_2wbmb\\code for ui\\2wbmr_user_interface\\2wbmr_ui_ver2\\2wbmr_ui_ver2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B7CA42C9-A1E0-4D91-B8E6-3D9500EFE656}|2WBMR_UI_ver2\\2WBMR_UI_ver2.csproj|solutionrelative:2wbmr_ui_ver2\\2wbmr_ui_ver2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B7CA42C9-A1E0-4D91-B8E6-3D9500EFE656}|2WBMR_UI_ver2\\2WBMR_UI_ver2.csproj|D:\\Dowload_Files\\Downloads\\Original_2WBMB\\Code for UI\\2WBMR_User_Interface\\2wbmr_ui_ver2\\properties\\settings.settings||{6D2695F9-5365-4A78-89ED-F205C045BFE6}",
+      "RelativeMoniker": "D:0:0:{B7CA42C9-A1E0-4D91-B8E6-3D9500EFE656}|2WBMR_UI_ver2\\2WBMR_UI_ver2.csproj|solutionrelative:2wbmr_ui_ver2\\properties\\settings.settings||{6D2695F9-5365-4A78-89ED-F205C045BFE6}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B7CA42C9-A1E0-4D91-B8E6-3D9500EFE656}|2WBMR_UI_ver2\\2WBMR_UI_ver2.csproj|D:\\Dowload_Files\\Downloads\\Original_2WBMB\\Code for UI\\2WBMR_User_Interface\\2wbmr_ui_ver2\\robotsystemconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B7CA42C9-A1E0-4D91-B8E6-3D9500EFE656}|2WBMR_UI_ver2\\2WBMR_UI_ver2.csproj|solutionrelative:2wbmr_ui_ver2\\robotsystemconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 297,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Settings.settings",
+              "DocumentMoniker": "D:\\Dowload_Files\\Downloads\\Original_2WBMB\\Code for UI\\2WBMR_User_Interface\\2WBMR_UI_ver2\\Properties\\Settings.settings",
+              "RelativeDocumentMoniker": "2WBMR_UI_ver2\\Properties\\Settings.settings",
+              "ToolTip": "D:\\Dowload_Files\\Downloads\\Original_2WBMB\\Code for UI\\2WBMR_User_Interface\\2WBMR_UI_ver2\\Properties\\Settings.settings",
+              "RelativeToolTip": "2WBMR_UI_ver2\\Properties\\Settings.settings",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002767|",
+              "WhenOpened": "2026-04-01T09:22:07.507Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "2WBMR_UI_ver2.cs",
+              "DocumentMoniker": "D:\\Dowload_Files\\Downloads\\Original_2WBMB\\Code for UI\\2WBMR_User_Interface\\2WBMR_UI_ver2\\2WBMR_UI_ver2.cs",
+              "RelativeDocumentMoniker": "2WBMR_UI_ver2\\2WBMR_UI_ver2.cs",
+              "ToolTip": "D:\\Dowload_Files\\Downloads\\Original_2WBMB\\Code for UI\\2WBMR_User_Interface\\2WBMR_UI_ver2\\2WBMR_UI_ver2.cs",
+              "RelativeToolTip": "2WBMR_UI_ver2\\2WBMR_UI_ver2.cs",
+              "ViewState": "AgIAADEDAAAAAAAAAAAAADsDAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-01T09:22:07.632Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "RobotSystemConfig.cs",
+              "DocumentMoniker": "D:\\Dowload_Files\\Downloads\\Original_2WBMB\\Code for UI\\2WBMR_User_Interface\\2WBMR_UI_ver2\\RobotSystemConfig.cs",
+              "RelativeDocumentMoniker": "2WBMR_UI_ver2\\RobotSystemConfig.cs",
+              "ToolTip": "D:\\Dowload_Files\\Downloads\\Original_2WBMB\\Code for UI\\2WBMR_User_Interface\\2WBMR_UI_ver2\\RobotSystemConfig.cs",
+              "RelativeToolTip": "2WBMR_UI_ver2\\RobotSystemConfig.cs",
+              "ViewState": "AgIAAJoBAAAAAAAAAAAmwJABAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-01T09:22:07.726Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
