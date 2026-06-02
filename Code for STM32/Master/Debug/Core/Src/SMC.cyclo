@@ -1,4 +1,0 @@
-../Core/Src/SMC.c:17:6:TwoWBMR_Init	1
-../Core/Src/SMC.c:34:6:compute_f_smc	1
-../Core/Src/SMC.c:110:6:compute_G_smc	1
-../Core/Src/SMC.c:151:6:SMC_control	1

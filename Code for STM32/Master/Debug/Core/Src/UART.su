@@ -1,3 +1,0 @@
-../Core/Inc/ESP32.h:15:23:ring_increase	16	static
-../Core/Src/UART.c:19:6:HAL_UART_RxCpltCallback	32	static
-../Core/Src/UART.c:32:6:HAL_UARTEx_RxEventCallback	16	static

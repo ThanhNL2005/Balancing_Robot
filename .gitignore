@@ -1,0 +1,57 @@
+# ========================
+# C/C++ & STM32 (Master/Slave)
+# ========================
+*.o
+*.obj
+*.elf
+*.map
+*.hex
+*.bin
+*.lst
+MDK-ARM/Objects/
+MDK-ARM/Listings/
+*.uvguix.*
+*.uvoptx
+*.crf
+*.d
+*.bak
+Debug/
+Release/
+
+# ========================
+# CMake, Ninja & VSCode IDE
+# ========================
+build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+.ninja_deps
+.ninja_log
+build.ninja
+.vscode/
+
+# ========================
+# Visual Studio (C# UI App)
+# ========================
+.vs/
+bin/
+obj/
+packages/*.zip
+*.user
+*.suo
+*.cache
+*.vsidx
+*.pdb
+
+# ========================
+# Matlab & Simulink
+# ========================
+slprj/
+*.mat
+*.slxc
+
+# OS generated files
+.DS_Store
+Thumbs.db

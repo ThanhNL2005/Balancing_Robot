@@ -1,5 +1,0 @@
-../Core/Src/RS485.c:10:9:calculate_checksum	24	static
-../Core/Src/RS485.c:21:6:float_to_bytes	24	static
-../Core/Src/RS485.c:38:7:bytes_to_float	24	static
-../Core/Src/RS485.c:54:6:create_frame	32	static
-../Core/Src/RS485.c:70:6:send_rs485	24	static

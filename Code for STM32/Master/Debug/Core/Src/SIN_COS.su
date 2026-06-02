@@ -1,3 +1,0 @@
-../Core/Src/SIN_COS.c:9:6:init_lookup_table	16	static
-../Core/Src/SIN_COS.c:20:7:lookup_sin	24	static
-../Core/Src/SIN_COS.c:28:7:lookup_cos	24	static
