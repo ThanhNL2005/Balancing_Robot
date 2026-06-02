@@ -35,8 +35,8 @@ namespace _2WBMR_UI_ver2
         Size originalParentControlSize;
 
         // Dinh nghia toan cuc Frame du lieu nhan tu ESP32
-        private const byte START_BYTE = 24;
-        private const byte END_BYTE = 25;
+        private const byte UPLINK_START_BYTE = 0xAA;
+        private const byte END_BYTE = 0xED;
         private int structSize = Marshal.SizeOf(typeof(DataReceive));
         private List<byte> serialBuffer = new List<byte>();
 
@@ -194,8 +194,8 @@ namespace _2WBMR_UI_ver2
         PictureBox picVehicle = new PictureBox();
 
         /**** Định nghĩa frame lệnh gửi cho xe ****/
-        byte startByte = 0xBB; // byte bắt đầu
-        byte endByte = 0x66; // byte kết thúc
+        byte downlink_startByte = 0xBB; // byte bắt đầu
+        byte endByte = 0xED; // byte kết thúc
 
         /**** Cau truc du lieu nhan tu ESP32 ****/
         [StructLayout(LayoutKind.Sequential, Pack = 1)] // sắp xếp trật tự các biến và ko có PADDING
@@ -769,8 +769,8 @@ namespace _2WBMR_UI_ver2
                 // Điều kiện để luôn luôn thực hiện được việc kiểm tra mảng dữ liệu 
                 while (serialBuffer.Count >= structSize)
                 {
-                    // Tìm byte bắt đầu START_BYTE (START_BYTE có thể nằm ở vị trí bất kì trong mảng)
-                    int startIndex = serialBuffer.IndexOf(START_BYTE);
+                    // Tìm byte bắt đầu UPLINK_START_BYTE (UPLINK_START_BYTE có thể nằm ở vị trí bất kì trong mảng)
+                    int startIndex = serialBuffer.IndexOf(UPLINK_START_BYTE);
 
                     // Nếu không có start byte
                     if (startIndex == -1)
@@ -779,14 +779,14 @@ namespace _2WBMR_UI_ver2
                         return; // Thoát khỏi phương thức
                     }
 
-                    // Nếu frame đọc được có START_BYTE, nhưng số lượng bytes
-                    // tính từ vị trí của START_BYTE chưa đủ bằng kích thức của Struct dữ liệu
+                    // Nếu frame đọc được có UPLINK_START_BYTE, nhưng số lượng bytes
+                    // tính từ vị trí của UPLINK_START_BYTE chưa đủ bằng kích thức của Struct dữ liệu
                     if (serialBuffer.Count < startIndex + structSize)
                     {
                         return; // Thoát khỏi phương thức. Chờ thêm dữ liệu đọc lên từ cổng COM, rồi mới xử lý tiếp
                     }
 
-                    // Nếu frame đã có START_BYTE, số bytes đủ bằng với số bytes của Struct dữ liệu,
+                    // Nếu frame đã có UPLINK_START_BYTE, số bytes đủ bằng với số bytes của Struct dữ liệu,
                     // -> kiểm tra byte kết thúc
                     if (serialBuffer[startIndex + structSize - 1] == END_BYTE)
                     {
@@ -1095,25 +1095,27 @@ namespace _2WBMR_UI_ver2
             }
             return crc;
         }
-        private void SendShortFrame(byte startByte, byte endByte, int DataType, int Index, ushort dataSend)
+        private void SendShortFrame(byte downlink_startByte, byte endByte, int DataType, int Index, ushort dataSend)
         {
-            // Frame 8 BTYES {0: start/ 1: dữ liệu loại ()/ 2: loại frame/ 3: thứ tự trong loại/ 4-5: 2 byte dữ liệu/ 6: checksum/ 7: end}
-            byte[] transBuff = new byte[8];
-            transBuff[0] = startByte; transBuff[7] = endByte;
+            // Frame 9 BTYES {0: start/ 1: dữ liệu loại ()/ 2: loại frame/ 3: thứ tự trong loại/ 4-5: 2 byte dữ liệu/ 6-7: checksum/ 8: end}
+            byte[] transBuff = new byte[9];
+            transBuff[0] = downlink_startByte; transBuff[8] = endByte;
             transBuff[1] = (byte)DataType; transBuff[2] = 0x00;
             transBuff[3] = (byte)Index;
             transBuff[4] = (byte)(dataSend); transBuff[5] = (byte)(dataSend >> 8);
-            transBuff[6] = (byte)Modbus_CRC16(transBuff, 8, 0, 5);
-            serCOM.Write(transBuff, 0, 8);
+            ushort crc16 = Modbus_CRC16(transBuff, 9, 0, 5);
+            transBuff[6] = (byte)(crc16 & 0xFF);        // Byte thấp của CRC16
+            transBuff[7] = (byte)((crc16 >> 8) & 0xFF); // Byte cao của CRC16
+            serCOM.Write(transBuff, 0, 9);
         }
         private async void btnRobotRun_Click(object sender, EventArgs e)
         {
             if (serCOM.IsOpen)
             {
-                // Frame 8 BTYES {0: start/ 1: dữ liệu loại ()/ 2: loại frame/ 3: thứ tự trong loại/ 4-5: 2 byte dữ liệu/ 6: checksum/ 7: end}
+                // Frame 9 BTYES {0: start/ 1: dữ liệu loại ()/ 2: loại frame/ 3: thứ tự trong loại/ 4-5: 2 byte dữ liệu/ 6-7: checksum/ 8: end}
                 // Với lệnh RUN: byte [1] dữ liệu loại 0; byte [3] thứ tự là 1; byte [4] và byte [5] là 0x00 và 0x00
 
-                SendShortFrame(startByte, endByte, 0, 1, 0);
+                SendShortFrame(downlink_startByte, endByte, 0, 1, 0);
                 await Task.Delay(50);
             }
             else MessageBox.Show("Cổng COM chưa được kết nối, xin hãy kiểm tra lại!");
@@ -1122,10 +1124,10 @@ namespace _2WBMR_UI_ver2
         {
             if (serCOM.IsOpen)
             {
-                // Frame 8 BTYES {0: start/ 1: dữ liệu loại ()/ 2: loại frame/ 3: thứ tự trong loại/ 4-5: 2 byte dữ liệu/ 6: checksum/ 7: end}
+                // Frame 9 BTYES {0: start/ 1: dữ liệu loại ()/ 2: loại frame/ 3: thứ tự trong loại/ 4-5: 2 byte dữ liệu/ 6-7: checksum/ 8: end}
                 // Với lệnh STOP: byte [1] dữ liệu loại 0; byte [3] thứ tự là 0; byte [4] và byte [5] là 0x00 và 0x00
 
-                SendShortFrame(startByte, endByte, 0, 0, 0);
+                SendShortFrame(downlink_startByte, endByte, 0, 0, 0);
                 await Task.Delay(50);
             }
             else MessageBox.Show("Cổng COM chưa được kết nối, xin hãy kiểm tra lại!");

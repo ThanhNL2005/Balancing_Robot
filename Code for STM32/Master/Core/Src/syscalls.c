@@ -1,5 +1,8 @@
 #include <sys/stat.h>
 
+int errno;
+int *__errno(void) { return &errno; }
+
 int _close(int file) {
     return -1;
 }

@@ -1,0 +1,114 @@
+function [u1, s1, u_eq_x, u_sw_x, s2, u_eq_theta, u_sw_theta, u2, s3, u_eq_psi, u_sw_psi]  = SMC_SMC(x1d, x1d_d, x1d_dd, x3d, x3d_d, x3d_dd, x5d, x5d_d, x5d_dd, x1, x2, x3, x4, x5, x6)
+    %% Parameters
+    mB = 21;      % mass of Pendulum Body     %21
+    mW = 0.512;       % mass of each wheel
+    J = 1.35e-3; K = 6.73e-4;     % mass moment of inertia of each wheel
+    r = 0.0725;      % radius of wheels
+    g = 9.81;     % gravity
+    d = 0.45;     % distance between the two wheels
+    l = 0.6;     % length of pendulum
+    I1 = 1.476; I2 = 2.624; I3 = 1.476;       % mass moment of inertia of the pendulum body
+    alpha = 0.5;      % damping torque
+    
+    
+    a11 = mB + 2*mW + 2*J/r^2;
+    a12 = mB*l*cos(x3);
+    a21 = a12;
+    a22 = I2+mB*l*l;
+    a33 = I3 + 2*K + (mW + J/r/r)*(d^2)/2 - (I3 - I1 - mB*l*l)*sin(x3)^2;
+    
+    c12 = -mB*l*x4*sin(x3);
+    c13 = -mB*l*x6*sin(x3);
+    c23 = (I3-I1-mB*l*l)*x6*sin(x3)*cos(x3);
+    c31 = mB*l*x6*sin(x3);
+    c32 = -(I3-I1-mB*l*l)*x6*sin(x3)*cos(x3);
+    c33 = -(I3-I1-mB*l*l)*x4*sin(x3)*cos(x3);
+    
+    d11 = 2*alpha/r^2;
+    d22 = 2*alpha;
+    d12 = -d22/r;
+    d21 = d12;
+    d33 = (d^2/(2*r^2))*alpha;
+    
+    M = [a11 a12 0;
+         a21 a22 0; 
+         0   0   a33];
+    C = [0   c12 c13; 
+         0   0   c23; 
+         c31 c32 c33];
+    D = [d11 d12 0;
+         d21 d22 0;
+         0   0   d33];
+    q = [x1; x3; x5];
+    q_d = [x2; x4; x6];
+    G = [0; -mB*l*g*sin(x3); 0];
+    Z = [1/r 0  0
+         0 -1 0
+         0 0  -d/(2*r)];
+    
+    Fx = -inv(M)*(G+C*q_d+D*q_d);
+    f1 = Fx(1);
+    f2 = Fx(2);
+    f3 = Fx(3);
+
+    Gx = inv(M) * Z;
+    g1 = Gx(1) + Gx(4);
+    g2 = Gx(2) + Gx(5);
+    g3 = Gx(9);
+
+    %% Control parameters
+    % First SMC controlling x
+    a1 = 140; 
+    beta1 = 0.1;
+    k1 = 1;
+    
+    % Second SMC controlling theta
+    a2 = 250;
+    beta2 = 0.1;
+    k2 = 5;
+    
+    % Third SMC controlling psi
+    a3 = 2.5; %25;
+    beta3 = 0.01;
+    k3 = 3; %15;
+
+    
+    %% Sliding surfaces
+    e1 = -(x1 - x1d);
+    e2 = -(x2 - x1d_d);
+    e3 = (x3 - x3d);
+    e4 = (x4 - x3d_d);
+    e5 = (x5 - x5d);
+    e6 = (x6 - x5d_d);
+    
+    s1 = a1*e1 + e2;
+    s2 = a2*e3 + e4;
+    s3 = a3*e5 + e6;
+
+    %% Outputs
+    u_x = (1/g1)*(-a1*e2 - f1 + x1d_dd - beta1*sign(s1)-k1*s1);
+    u_eq_x = (1/g1)*(-a1*e2 - f1 + x1d_dd);
+    u_sw_x = (1/g1)*(- beta1*sign(s1)-k1*s1);
+
+    u_theta = (1/g2)*(-a2*e4 - f2 + x3d_dd - beta2*sign(s2)-k2*s2);
+    u_eq_theta = (1/g2)*(-a2*e4 - f2 + x3d_dd);
+    u_sw_theta = (1/g2)*(- beta2*sign(s2)-k2*s2);
+
+    u_psi = (1/g3)*(-a3*e6 - f3 + x5d_dd - beta3*sign(s3)-k3*s3);
+    u_eq_psi = (1/g3)*(-a3*e6 - f3 + x5d_dd);
+    u_sw_psi = (1/g3)*(- beta3*sign(s3)-k3*s3);
+
+    u1 = u_x + u_theta;
+    u2 = u_psi;
+end
+
+function y = sat(x)
+    if x > 1
+        y = 1;
+    elseif x < -1
+        y = -1;
+    else
+        y = x;
+    end
+end
+

@@ -1,9 +1,10 @@
 #pragma once
+#include "main.h"
 
-typedef struct
-{
-	uint8_t buff[32];
-	uint8_t rlength; // Số phần tử nhận được thực tế trong buff (đã trừ các phần tử sót lại của vòng trước)
+typedef struct {
+  uint8_t buff[32];
+  uint8_t rlength; // Số phần tử nhận được thực tế trong buff (đã trừ các phần
+                   // tử sót lại của vòng trước)
 } VS_struct;
 /******************************************************************************/
 #define short_frame_len 9
@@ -12,11 +13,11 @@ typedef struct
 #define VS_End_Byte 0x66
 #define RING_BUFF_LEN 64
 /******************************************************************************/
-static inline uint8_t ring_increase(volatile uint8_t val)
-{
-	return (val + 1) & (RING_BUFF_LEN - 1);
+static inline uint8_t ring_increase(volatile uint8_t val) {
+  return (val + 1) & (RING_BUFF_LEN - 1);
 }
-void Send_Data_To_ESP32(UART_HandleTypeDef *huart, uint8_t id,HWT906 *hwt906_data,SP_CAN *can, GET_CAN *get_can, uint8_t *frame);
+void Send_Data_To_ESP32(UART_HandleTypeDef *huart, HWT906 *hwt906_data,
+                        SP_CAN *can, GET_CAN *get_can, uint8_t *frame);
 void Read_And_Process_VSData(void);
 void Process_VS_Data(void);
 /******************************************************************************/

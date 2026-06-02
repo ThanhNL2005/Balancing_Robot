@@ -1,5 +1,5 @@
 % load dữ liệu mô phỏng của x và psi
-modelName = 'MyControl_3SMCs_testVer';
+modelName = 'MyControl_3SMCs_2022b_Ver';
 load_system(modelName);
 simOut = sim(modelName);
 output = simOut.get('OutputData');
@@ -19,7 +19,7 @@ plot(X_r, Y_r, 'r--', 'LineWidth', 1);
 xlabel('n_{1}', 'Interpreter', 'tex', 'FontName', fontName, 'FontSize', fontSize);
 ylabel('n_{2}', 'Interpreter', 'tex', 'FontName', fontName, 'FontSize', fontSize);
 title('Quỹ đạo điểm chuyển động của xe theo On_{1}n_{2}');
-legend({'Quỹ đạo mô phỏng', 'Quỹ đạo đặt'}, 'Interpreter', 'latex', 'FontSize', 13, 'Location', 'northeast');
+legend({'Quỹ đạo mô phỏng', 'Quỹ đạo đặt'}, 'Interpreter', 'none', 'FontSize', 13, 'Location', 'northeast');
 axis equal;
 grid on;
 set(gca, 'FontName', fontName, 'FontSize', fontSize);
