@@ -45,8 +45,7 @@ float bytes_to_float(const uint8_t *bytes) {
 }
 // [start (1 byte)][addr_sender (1 byte)][addr_receiver (1 byte)][data: 2 bi?n
 // float (8 byte)][checksum (1 byte)]
-void create_frame(uint8_t sender, uint8_t receiver, float f1, float f2,
-                  uint8_t *frame) {
+void create_frame(uint8_t sender, uint8_t receiver, float f1, float f2, uint8_t *frame) {
   // start byte
   frame[0] = FRAME_START_BYTE;
 
@@ -61,8 +60,7 @@ void create_frame(uint8_t sender, uint8_t receiver, float f1, float f2,
   // caculator checksum
   frame[11] = calculate_checksum(frame, 11);
 }
-void send_rs485(uint8_t sender, uint8_t receiver, float f1, float f2,
-                uint8_t *frame) {
+void send_rs485(uint8_t sender, uint8_t receiver, float f1, float f2, uint8_t *frame) {
   create_frame(sender, receiver, f1, f2, frame);
   HAL_UART_Transmit_DMA(&huart2, frame, FRAME_SIZE);
 }

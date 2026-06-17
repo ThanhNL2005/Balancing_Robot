@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32h7xx_hal.h" // IWYU pragma: export
+#include "stm32h7xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -288,6 +288,8 @@ void Toggle_Led(uint8_t led_number);
 #define LED1_GPIO_Port GPIOD
 #define LED2_Pin GPIO_PIN_3
 #define LED2_GPIO_Port GPIOD
+#define USART2_nW_Pin GPIO_PIN_4
+#define USART2_nW_GPIO_Port GPIOD
 
 /* USER CODE BEGIN Private defines */
 

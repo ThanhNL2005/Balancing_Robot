@@ -45,32 +45,27 @@ void compute_f_smc(const TWBMR *params, const HSMC *state, F *f) {
 
   // Compute Term1:
   // Term1 = r^2 * (mB * l^2 + I2) * (l * mB * sin(x3) * (x4^2 + x6^2))
-  float term1 = r2 * (params->mB * l2 + params->I2) *
-                (params->l * params->mB * sin_x3 * (x4 * x4 + x6 * x6));
+  float term1 = r2 * (params->mB * l2 + params->I2) * (params->l * params->mB * sin_x3 * (x4 * x4 + x6 * x6));
 
   // Compute Term2:
   // Term2 = l * mB * r^2 * cos(x3) * [ cos(x3)*sin(x3)*(mB * l^2 + I1 -
   // I3)*x6^2 + g*l*mB*sin(x3) ]
   float term2 = params->l * params->mB * r2 * cos_x3 *
-                (cos_x3 * sin_x3 * (params->mB * l2 + params->I1 - params->I3) *
-                     (x6 * x6) +
+                (cos_x3 * sin_x3 * (params->mB * l2 + params->I1 - params->I3) * (x6 * x6) +
                  params->g * params->l * params->mB * sin_x3);
 
   // Compute the denominator (#1):
   // #1 = 2*I2*J + l*mB*r^2 + 2*J*l*mB + I2*mB*r^2 + 2*I2*mW*r^2 -
   // l*mB*r^2*cos(x3) + 2*l*mB*mW*r^2
-  float D = 2.0f * params->I2 * params->J + params->l * params->mB * r2 +
-            2.0f * params->J * params->l * params->mB +
-            params->I2 * params->mB * r2 + 2.0f * params->I2 * params->mW * r2 -
-            params->l * params->mB * r2 * cos_x3 +
+  float D = 2.0f * params->I2 * params->J + params->l * params->mB * r2 + 2.0f * params->J * params->l * params->mB +
+            params->I2 * params->mB * r2 + 2.0f * params->I2 * params->mW * r2 - params->l * params->mB * r2 * cos_x3 +
             2.0f * params->l * params->mB * params->mW * r2;
 
   // Calculate f1 as (Term1 - Term2) divided by D
   f->f1 = (term1 - term2) / D;
   // Compute the first part of the numerator:
   // Part1 = ( cos(x3)*sin(x3)*(mB*l^2 + I1 - I3)*x6^2 + g*l*mB*sin(x3) )
-  float part1 = cos_x3 * sin_x3 * (params->mB * l2 + params->I1 - params->I3) *
-                    (x6 * x6) +
+  float part1 = cos_x3 * sin_x3 * (params->mB * l2 + params->I1 - params->I3) * (x6 * x6) +
                 params->g * params->l * params->mB * sin_x3;
 
   // Compute the multiplier factor for part1:
@@ -79,8 +74,7 @@ void compute_f_smc(const TWBMR *params, const HSMC *state, F *f) {
 
   // Compute the second part of the numerator:
   // Part2 = l*mB*r^2*cos(x3) * ( l*mB*sin(x3)*(x4^2 + x6^2) )
-  float part2 = params->l * params->mB * r2 * cos_x3 *
-                (params->l * params->mB * sin_x3 * (x4 * x4 + x6 * x6));
+  float part2 = params->l * params->mB * r2 * cos_x3 * (params->l * params->mB * sin_x3 * (x4 * x4 + x6 * x6));
 
   // Calculate f2 as (Part1*factor - Part2) divided by D
   f->f2 = (part1 * factor - part2) / D;
@@ -91,16 +85,14 @@ void compute_f_smc(const TWBMR *params, const HSMC *state, F *f) {
   // Compute the numerator:
   // Numerator = r^2 * [ l*mB*x2*x6*sin(x3) + 2*x4*x6*cos(x3)*sin(x3)*(mB*l^2 +
   // I1 - I3) ]
-  float numerator = r2 * (term_common * x2 * x6 * sin_x3 +
-                          2.0f * x4 * x6 * cos_x3 * sin_x3 *
-                              (params->mB * l2 + params->I1 - params->I3));
+  float numerator =
+      r2 * (term_common * x2 * x6 * sin_x3 + 2.0f * x4 * x6 * cos_x3 * sin_x3 * (params->mB * l2 + params->I1 - params->I3));
 
   // Compute the denominator:
   // Denom = J*d^2 + I3*r^2 + 2*K*r^2 + d^2*mW*r^2 + I1*r^2*sin(x3)^2 -
   // I3*r^2*sin(x3)^2 + l*mB*r^2*sin(x3)
-  float denom = params->J * d2 + params->I3 * r2 + 2.0f * params->K * r2 +
-                d2 * params->mW * r2 + params->I1 * r2 * (sin_x3 * sin_x3) -
-                params->I3 * r2 * (sin_x3 * sin_x3) +
+  float denom = params->J * d2 + params->I3 * r2 + 2.0f * params->K * r2 + d2 * params->mW * r2 +
+                params->I1 * r2 * (sin_x3 * sin_x3) - params->I3 * r2 * (sin_x3 * sin_x3) +
                 params->l * params->mB * r2 * sin_x3;
 
   // Calculate f3 as the negative ratio of numerator to denominator
@@ -120,15 +112,12 @@ void compute_G_smc(const TWBMR *params, const HSMC *state, G *g) {
   float MB2 = params->mB * params->mB;
 
   // Compute denominator for g1 and g2
-  float denominator_g1g2 =
-      2.0f * params->I2 * params->J + l2 * MB2 * r2 +
-      2.0f * params->J * l2 * params->mB + params->I2 * params->mB * r2 +
-      2.0f * params->I2 * params->mW * r2 - l2 * MB2 * r2 * cos_x3_sq +
-      2.0f * l2 * params->mB * params->mW * r2;
+  float denominator_g1g2 = 2.0f * params->I2 * params->J + l2 * MB2 * r2 + 2.0f * params->J * l2 * params->mB +
+                           params->I2 * params->mB * r2 + 2.0f * params->I2 * params->mW * r2 - l2 * MB2 * r2 * cos_x3_sq +
+                           2.0f * l2 * params->mB * params->mW * r2;
 
   // Calculate g1
-  float numerator_g1 = (r2 * (params->mB * l2 + params->I2)) +
-                       (params->l * params->mB * r2 * cos_x3);
+  float numerator_g1 = (r2 * (params->mB * l2 + params->I2)) + (params->l * params->mB * r2 * cos_x3);
   g->g1 = numerator_g1 / denominator_g1g2;
 
   // Calculate g2
@@ -137,11 +126,9 @@ void compute_G_smc(const TWBMR *params, const HSMC *state, G *g) {
   g->g2 = -(termA + termB) / denominator_g1g2;
 
   // Compute denominator for g3
-  float denominator_g3_part =
-      params->J * params->d * params->d + params->I3 * r2 +
-      2.0f * params->K * r2 + params->d * params->d * params->mW * r2 +
-      params->I1 * r2 * sin_x3_sq - params->I3 * r2 * sin_x3_sq +
-      l2 * params->mB * r2 * sin_x3_sq;
+  float denominator_g3_part = params->J * params->d * params->d + params->I3 * r2 + 2.0f * params->K * r2 +
+                              params->d * params->d * params->mW * r2 + params->I1 * r2 * sin_x3_sq -
+                              params->I3 * r2 * sin_x3_sq + l2 * params->mB * r2 * sin_x3_sq;
   float denominator_g3 = 2.0f * denominator_g3_part;
 
   // Calculate g3
@@ -177,15 +164,10 @@ void SMC_control(TWBMR *param, SMC *smc, F *f, G *g) {
   smc->s2 = smc->c2 * smc->e3 + smc->e4;
   smc->s3 = smc->c3 * smc->e5 + smc->e6;
 
-  smc->u_x = (1 / g->g1) *
-             (-smc->c1 * smc->e2 + x1d_dd -
-              smc->ETA1 * ((smc->s1 > 0) - (smc->s1 < 0)) - smc->k1 * smc->s1);
-  smc->u_theta = (1 / g->g2) * (-smc->c2 * smc->e4 + x3d_dd -
-                                smc->ETA2 * ((smc->s2 > 0) - (smc->s2 < 0)) -
-                                smc->k2 * smc->s2);
-  smc->u_psi = (1 / g->g3) * (-smc->c3 * smc->e6 + x5d_dd -
-                              smc->ETA3 * ((smc->s3 > 0) - (smc->s3 < 0)) -
-                              smc->k3 * smc->s3);
+  smc->u_x = (1 / g->g1) * (-smc->c1 * smc->e2 + x1d_dd - smc->ETA1 * ((smc->s1 > 0) - (smc->s1 < 0)) - smc->k1 * smc->s1);
+  smc->u_theta =
+      (1 / g->g2) * (-smc->c2 * smc->e4 + x3d_dd - smc->ETA2 * ((smc->s2 > 0) - (smc->s2 < 0)) - smc->k2 * smc->s2);
+  smc->u_psi = (1 / g->g3) * (-smc->c3 * smc->e6 + x5d_dd - smc->ETA3 * ((smc->s3 > 0) - (smc->s3 < 0)) - smc->k3 * smc->s3);
 
   smc->u1 = smc->u_x + smc->u_theta;
   smc->u2 = smc->u_psi;

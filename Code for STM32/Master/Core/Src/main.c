@@ -43,7 +43,6 @@
 
 FDCAN_HandleTypeDef hfdcan2;
 
-TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim5;
 
 UART_HandleTypeDef huart7;
@@ -66,8 +65,7 @@ FDCAN_RxHeaderTypeDef RxHeader;
 
 //
 const float f_base_Ts = 0.00005f; // PWM isr frequency - 20kHz
-const float f_theta_Ts =
-    0.004f; // Sampling frequency of the current control loop - 10kHz
+const float f_theta_Ts = 0.004f;  // Sampling frequency of the current control loop - 10kHz
 // Sampling frequency of the "gear shaft speed" control loop - 20Hz
 const float f_Gear_Ratio = 19.2f; // Gear box reduced speed ratio of motor
 const float f_Vbus_Nom = 24.0f;   // Norminal dc bus voltage - V
@@ -89,7 +87,7 @@ uint8_t rxBuffer[RX_SIZE] = {0};
 HWT906 HWT906_data;
 extern float angle_pitch;
 float angle_psi_1 = 0.00f;
-volatile uint8_t control = 0;
+volatile uint8_t control = 1;
 // CAN
 SP_CAN can_sp;
 GET_CAN can_get;
@@ -115,7 +113,6 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_FDCAN2_Init(void);
 static void MX_UART7_Init(void);
-static void MX_TIM1_Init(void);
 static void MX_TIM5_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART6_UART_Init(void);
@@ -137,12 +134,12 @@ void Toggle_Led(uint8_t led_number) {
   static uint8_t TimeTick2 = 0;
   if (led_number == 1) {
     if (++TimeTick1 == 100) {
-      HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_2);
+      HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_3); // Led 1 - Led đỏ
       TimeTick1 = 0;
     }
   } else if (led_number == 2) {
     if (++TimeTick2 == 100) {
-      HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_3);
+      HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_2); // Led 2 - Led xanh lá
       TimeTick2 = 0;
     }
   }
@@ -164,8 +161,7 @@ int main(void) {
 
   /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
-   */
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -184,7 +180,6 @@ int main(void) {
   MX_DMA_Init();
   MX_FDCAN2_Init();
   MX_UART7_Init();
-  MX_TIM1_Init();
   MX_TIM5_Init();
   MX_USART2_UART_Init();
   MX_USART6_UART_Init();
@@ -196,9 +191,6 @@ int main(void) {
   // Nhận dữ liệu IMU
   HAL_UART_Receive_DMA(&huart7, rxBuffer, RX_SIZE);
   HAL_Delay(1000);
-
-  // Timer interup
-  HAL_TIM_Base_Start_IT(&htim5);
 
   // SIN_COS
   init_lookup_table();
@@ -216,6 +208,10 @@ int main(void) {
   control_smc.k1 = 2.0f;
   control_smc.k2 = 10.0f;
   control_smc.k3 = 10.0f;
+
+  // Timer interup
+  HAL_TIM_Base_Start_IT(&htim5);
+
   HAL_Delay(3000);
 
   // Nhận dữ liệu ESP32
@@ -231,14 +227,13 @@ int main(void) {
   /* USER CODE BEGIN 3 */
   while (1) {
     // Xử lý lệnh được truyền xuống
-    if (VS_head != VS_tail) {
-      Read_And_Process_VSData();
+    if (vs_head != vs_tail) {
+      ReadAndProcessVSData();
     }
     // Tạo và gửi dữ liệu lên
-    if (tx_esp32) // T = 50 ms
-    {
-      Send_Data_To_ESP32(&huart6, &HWT906_data, &can_sp, &can_get, tx_frame);
-      tx_esp32 = 0;
+    if (g_tx_esp32_flag) {
+      SendDataToESP32(&huart6, &HWT906_data, &can_sp, &can_get, tx_frame);
+      g_tx_esp32_flag = 0;
     }
   }
 }
@@ -266,8 +261,7 @@ void SystemClock_Config(void) {
   /** Initializes the RCC Oscillators according to the specified parameters
    * in the RCC_OscInitTypeDef structure.
    */
-  RCC_OscInitStruct.OscillatorType =
-      RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_DIV2;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -287,8 +281,7 @@ void SystemClock_Config(void) {
 
   /** Initializes the CPU, AHB and APB buses clocks
    */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
-                                RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 |
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 |
                                 RCC_CLOCKTYPE_D3PCLK1 | RCC_CLOCKTYPE_D1PCLK1;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.SYSCLKDivider = RCC_SYSCLK_DIV1;
@@ -373,59 +366,6 @@ static void MX_FDCAN2_Init(void) {
 }
 
 /**
- * @brief TIM1 Initialization Function
- * @param None
- * @retval None
- */
-static void MX_TIM1_Init(void) {
-
-  /* USER CODE BEGIN TIM1_Init 0 */
-
-  /* USER CODE END TIM1_Init 0 */
-
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-  TIM_IC_InitTypeDef sConfigIC = {0};
-
-  /* USER CODE BEGIN TIM1_Init 1 */
-
-  /* USER CODE END TIM1_Init 1 */
-  htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 0;
-  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 8399;
-  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim1.Init.RepetitionCounter = 0;
-  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim1) != HAL_OK) {
-    Error_Handler();
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK) {
-    Error_Handler();
-  }
-  if (HAL_TIM_IC_Init(&htim1) != HAL_OK) {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK) {
-    Error_Handler();
-  }
-  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
-  sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-  sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-  sConfigIC.ICFilter = 0;
-  if (HAL_TIM_IC_ConfigChannel(&htim1, &sConfigIC, TIM_CHANNEL_1) != HAL_OK) {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM1_Init 2 */
-
-  /* USER CODE END TIM1_Init 2 */
-}
-
-/**
  * @brief TIM5 Initialization Function
  * @param None
  * @retval None
@@ -436,31 +376,28 @@ static void MX_TIM5_Init(void) {
 
   /* USER CODE END TIM5_Init 0 */
 
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
-  TIM_IC_InitTypeDef sConfigIC = {0};
 
   /* USER CODE BEGIN TIM5_Init 1 */
 
   /* USER CODE END TIM5_Init 1 */
   htim5.Instance = TIM5;
-  htim5.Init.Prescaler = 99;
+  htim5.Init.Prescaler = 199;
   htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim5.Init.Period = 99;
+  htim5.Init.Period = 2499;
   htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_IC_Init(&htim5) != HAL_OK) {
+  if (HAL_TIM_Base_Init(&htim5) != HAL_OK) {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim5, &sClockSourceConfig) != HAL_OK) {
     Error_Handler();
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim5, &sMasterConfig) != HAL_OK) {
-    Error_Handler();
-  }
-  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
-  sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-  sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-  sConfigIC.ICFilter = 0;
-  if (HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_1) != HAL_OK) {
     Error_Handler();
   }
   /* USER CODE BEGIN TIM5_Init 2 */
@@ -496,12 +433,10 @@ static void MX_UART7_Init(void) {
   if (HAL_UART_Init(&huart7) != HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart7, UART_TXFIFO_THRESHOLD_1_8) !=
-      HAL_OK) {
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart7, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart7, UART_RXFIFO_THRESHOLD_1_8) !=
-      HAL_OK) {
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart7, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK) {
     Error_Handler();
   }
   if (HAL_UARTEx_DisableFifoMode(&huart7) != HAL_OK) {
@@ -540,12 +475,10 @@ static void MX_UART8_Init(void) {
   if (HAL_UART_Init(&huart8) != HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart8, UART_TXFIFO_THRESHOLD_1_8) !=
-      HAL_OK) {
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart8, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart8, UART_RXFIFO_THRESHOLD_1_8) !=
-      HAL_OK) {
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart8, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK) {
     Error_Handler();
   }
   if (HAL_UARTEx_DisableFifoMode(&huart8) != HAL_OK) {
@@ -584,12 +517,10 @@ static void MX_USART2_UART_Init(void) {
   if (HAL_RS485Ex_Init(&huart2, UART_DE_POLARITY_HIGH, 0, 0) != HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart2, UART_TXFIFO_THRESHOLD_1_8) !=
-      HAL_OK) {
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart2, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart2, UART_RXFIFO_THRESHOLD_1_8) !=
-      HAL_OK) {
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart2, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK) {
     Error_Handler();
   }
   if (HAL_UARTEx_DisableFifoMode(&huart2) != HAL_OK) {
@@ -628,12 +559,10 @@ static void MX_USART6_UART_Init(void) {
   if (HAL_UART_Init(&huart6) != HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart6, UART_TXFIFO_THRESHOLD_1_8) !=
-      HAL_OK) {
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart6, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart6, UART_RXFIFO_THRESHOLD_1_8) !=
-      HAL_OK) {
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart6, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK) {
     Error_Handler();
   }
   if (HAL_UARTEx_DisableFifoMode(&huart6) != HAL_OK) {
@@ -687,7 +616,6 @@ static void MX_GPIO_Init(void) {
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
